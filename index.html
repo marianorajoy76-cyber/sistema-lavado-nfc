@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sistema Fidelización - Túnel Lavado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn:active {
+            transform: scale(0.95);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.6);
+        }
+
+        .nfc-reader {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+        }
+
+        .nfc-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .nfc-reader h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .nfc-reader p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .car-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .car-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .car-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .car-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .car-info-item label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 3px;
+        }
+
+        .car-info-item span {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            transition: width 0.5s ease;
+        }
+
+        .free-wash-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+            margin-top: 10px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-delete:active {
+            background: #c82333;
+        }
+
+        .btn-lavado {
+            border: none;
+            padding: 30px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn-lavado:active {
+            transform: scale(0.95);
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%);
+        }
+
+        .btn-excellence {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .lavado-type-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .badge-premium {
+            background: linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%);
+            color: white;
+        }
+
+        .badge-excellence {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .progress-section {
+            margin-bottom: 20px;
+        }
+
+        .progress-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .floating-wash-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 40px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+            transition: transform 0.2s, box-shadow 0.2s;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .floating-wash-btn:active {
+            transform: scale(0.9);
+        }
+
+        .floating-wash-btn:hover {
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Sistema de Fidelización</h1>
+            <p>Túnel de Lavado - NFC</p>
+        </div>
+
+        <div class="content">
+            <!-- Navigation -->
+            <div class="nav-buttons">
+                <button class="nav-btn active" onclick="showSection('nuevo')">
+                    ➕ Nuevo Cliente
+                </button>
+                <button class="nav-btn" onclick="showSection('clientes')">
+                    👥 Ver Clientes
+                </button>
+                <button class="nav-btn" onclick="showSection('historial')">
+                    📋 Historial
+                </button>
+                <button class="nav-btn" onclick="showSection('estadisticas')">
+                    📊 Estadísticas
+                </button>
+            </div>
+
+            <!-- Section: Registrar Lavado -->
+            <div id="section-registrar" class="section">
+                <div class="nfc-reader" id="nfcReader">
+                    <div class="nfc-icon">📱</div>
+                    <h2>Selecciona el tipo de lavado</h2>
+                    <p id="nfcStatus">Elige Premium o Excellence y acerca la tarjeta</p>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <button class="btn-lavado btn-premium" onclick="registrarLavadoPremium()">
+                        <div style="font-size: 40px; margin-bottom: 10px;">⭐</div>
+                        <div style="font-size: 24px; font-weight: bold;">PREMIUM</div>
+                        <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Acerca la tarjeta</div>
+                    </button>
+                    <button class="btn-lavado btn-excellence" onclick="registrarLavadoExcellence()">
+                        <div style="font-size: 40px; margin-bottom: 10px;">💎</div>
+                        <div style="font-size: 24px; font-weight: bold;">EXCELLENCE</div>
+                        <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Acerca la tarjeta</div>
+                    </button>
+                </div>
+                
+                <div id="registrarAlert"></div>
+            </div>
+
+            <!-- Section: Nuevo Cliente -->
+            <div id="section-nuevo" class="section active">
+                <h2 style="margin-bottom: 20px; color: #667eea;">Registrar Nuevo Cliente</h2>
+                <div id="nuevoAlert"></div>
+                
+                <div class="nfc-reader" onclick="readNFCForNewClient()">
+                    <div class="nfc-icon">📱</div>
+                    <h2>Toca para leer tarjeta NFC</h2>
+                    <p id="nfcStatusNuevo">Pulsa aquí y acerca la tarjeta</p>
+                </div>
+
+                <form id="nuevoClienteForm">
+                    <div class="form-group">
+                        <label>ID de Tarjeta NFC</label>
+                        <input type="text" id="nfcId" readonly placeholder="Lee la tarjeta primero">
+                    </div>
+                    <div class="form-group">
+                        <label>Matrícula del Vehículo *</label>
+                        <input type="text" id="matricula" placeholder="Ej: 1234ABC" required style="text-transform: uppercase;">
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre del Cliente (opcional)</label>
+                        <input type="text" id="nombreCliente" placeholder="Ej: Juan Pérez">
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono (opcional)</label>
+                        <input type="tel" id="telefono" placeholder="Ej: 612345678">
+                    </div>
+                    <button type="submit" class="btn">Registrar Cliente</button>
+                </form>
+            </div>
+
+            <!-- Section: Ver Clientes -->
+            <div id="section-clientes" class="section">
+                <h2 style="margin-bottom: 20px; color: #667eea;">Listado de Clientes</h2>
+                <div id="clientesList"></div>
+            </div>
+
+            <!-- Section: Historial -->
+            <div id="section-historial" class="section">
+                <h2 style="margin-bottom: 20px; color: #667eea;">Historial de Lavados</h2>
+                <button class="btn" onclick="exportarHistorial()" style="margin-bottom: 20px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                    📥 Exportar a Excel
+                </button>
+                <div id="historialList"></div>
+            </div>
+
+            <!-- Section: Estadísticas -->
+            <div id="section-estadisticas" class="section">
+                <h2 style="margin-bottom: 20px; color: #667eea;">Estadísticas Generales</h2>
+                <div id="estadisticasContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating button to register washes -->
+    <button class="floating-wash-btn" onclick="showSection('registrar')" title="Registrar Lavado">
+        🚗
+    </button>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, query, where, updateDoc, doc, deleteDoc, orderBy, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBUeUbu80WEBCJ5O7PgqmGjEJIs-EKfBQ8",
+            authDomain: "sistema-fidelizacion-lavado.firebaseapp.com",
+            projectId: "sistema-fidelizacion-lavado",
+            storageBucket: "sistema-fidelizacion-lavado.firebasestorage.app",
+            messagingSenderId: "246910277789",
+            appId: "1:246910277789:web:242e7a842903289bd99c74",
+            measurementId: "G-567D3V6VEC"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Global variables
+        window.currentNFCId = null;
+        window.db = db;
+        window.firestoreModules = { collection, addDoc, getDocs, query, where, updateDoc, doc, deleteDoc, orderBy, Timestamp };
+
+        // NFC Functions
+        async function readNFC() {
+            if (!('NDEFReader' in window)) {
+                return { success: false, error: 'Tu dispositivo no soporta NFC o no está habilitado. Asegúrate de que el NFC esté activado en Ajustes.' };
+            }
+
+            try {
+                const ndef = new NDEFReader();
+                await ndef.scan();
+                
+                return new Promise((resolve) => {
+                    ndef.addEventListener('reading', ({ serialNumber }) => {
+                        const nfcId = serialNumber.replace(/:/g, '').toUpperCase();
+                        resolve({ success: true, nfcId });
+                    });
+
+                    setTimeout(() => {
+                        resolve({ success: false, error: 'Tiempo de espera agotado. Intenta de nuevo.' });
+                    }, 10000);
+                });
+            } catch (error) {
+                return { success: false, error: `Error de NFC: ${error.message}` };
+            }
+        }
+
+        // Registrar Lavado Premium
+        async function registrarLavadoPremium() {
+            await registrarLavado('premium');
+        }
+
+        // Registrar Lavado Excellence
+        async function registrarLavadoExcellence() {
+            await registrarLavado('excellence');
+        }
+
+        // Registrar Lavado (genérico)
+        async function registrarLavado(tipoLavado) {
+            const statusElement = document.getElementById('nfcStatus');
+            const alertElement = document.getElementById('registrarAlert');
+            
+            const tipoTexto = tipoLavado === 'premium' ? 'PREMIUM ⭐' : 'EXCELLENCE 💎';
+            statusElement.textContent = `Leyendo tarjeta para lavado ${tipoTexto}...`;
+            alertElement.innerHTML = '';
+
+            const result = await readNFC();
+
+            if (!result.success) {
+                statusElement.textContent = 'Error al leer tarjeta';
+                alertElement.innerHTML = `<div class="alert alert-error">${result.error}</div>`;
+                setTimeout(() => {
+                    statusElement.textContent = 'Elige Premium o Excellence y acerca la tarjeta';
+                    alertElement.innerHTML = '';
+                }, 3000);
+                return;
+            }
+
+            const nfcId = result.nfcId;
+            statusElement.textContent = `Tarjeta detectada: ${nfcId}`;
+
+            try {
+                // Buscar cliente
+                const q = query(collection(db, 'clientes'), where('nfcId', '==', nfcId));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    alertElement.innerHTML = `<div class="alert alert-error">⚠️ Tarjeta no registrada. Por favor, registra este cliente primero.</div>`;
+                    setTimeout(() => {
+                        statusElement.textContent = 'Elige Premium o Excellence y acerca la tarjeta';
+                        alertElement.innerHTML = '';
+                    }, 4000);
+                    return;
+                }
+
+                const clienteDoc = querySnapshot.docs[0];
+                const clienteData = clienteDoc.data();
+                
+                // Obtener contadores según el tipo
+                const contadorActual = tipoLavado === 'premium' 
+                    ? (clienteData.lavadosPremium || 0)
+                    : (clienteData.lavadosExcellence || 0);
+                
+                const lavadosGratisPremium = clienteData.lavadosGratisPremium || 0;
+                const lavadosGratisExcellence = clienteData.lavadosGratisExcellence || 0;
+
+                const nuevoContador = contadorActual + 1;
+                let mensaje = '';
+                let updateData = {
+                    ultimoLavado: Timestamp.now()
+                };
+
+                if (nuevoContador === 10) {
+                    // Cliente ganó un lavado gratis
+                    if (tipoLavado === 'premium') {
+                        updateData.lavadosPremium = 0;
+                        updateData.lavadosGratisPremium = lavadosGratisPremium + 1;
+                        mensaje = `🎉 ¡FELICIDADES ${clienteData.matricula}! Has ganado un lavado PREMIUM GRATIS. Total lavados gratis Premium: ${lavadosGratisPremium + 1}`;
+                    } else {
+                        updateData.lavadosExcellence = 0;
+                        updateData.lavadosGratisExcellence = lavadosGratisExcellence + 1;
+                        mensaje = `🎉 ¡FELICIDADES ${clienteData.matricula}! Has ganado un lavado EXCELLENCE GRATIS. Total lavados gratis Excellence: ${lavadosGratisExcellence + 1}`;
+                    }
+                } else {
+                    const faltantes = 10 - nuevoContador;
+                    if (tipoLavado === 'premium') {
+                        updateData.lavadosPremium = nuevoContador;
+                        mensaje = `✅ Lavado PREMIUM registrado para ${clienteData.matricula}. Llevas ${nuevoContador} de 10. ¡Te faltan ${faltantes} para el gratis!`;
+                    } else {
+                        updateData.lavadosExcellence = nuevoContador;
+                        mensaje = `✅ Lavado EXCELLENCE registrado para ${clienteData.matricula}. Llevas ${nuevoContador} de 10. ¡Te faltan ${faltantes} para el gratis!`;
+                    }
+                }
+
+                await updateDoc(doc(db, 'clientes', clienteDoc.id), updateData);
+
+                // Registrar en historial
+                await addDoc(collection(db, 'historial'), {
+                    nfcId: nfcId,
+                    matricula: clienteData.matricula,
+                    fecha: Timestamp.now(),
+                    tipoLavado: tipoLavado,
+                    lavadoGratis: nuevoContador === 10
+                });
+
+                alertElement.innerHTML = `<div class="alert alert-success">${mensaje}</div>`;
+                
+                setTimeout(() => {
+                    statusElement.textContent = 'Elige Premium o Excellence y acerca la tarjeta';
+                    alertElement.innerHTML = '';
+                }, 5000);
+
+            } catch (error) {
+                alertElement.innerHTML = `<div class="alert alert-error">Error al registrar: ${error.message}</div>`;
+                setTimeout(() => {
+                    statusElement.textContent = 'Elige Premium o Excellence y acerca la tarjeta';
+                    alertElement.innerHTML = '';
+                }, 3000);
+            }
+        }
+
+        // Leer NFC para nuevo cliente
+        window.readNFCForNewClient = async function() {
+            const statusElement = document.getElementById('nfcStatusNuevo');
+            const alertElement = document.getElementById('nuevoAlert');
+            
+            statusElement.textContent = 'Leyendo tarjeta...';
+            alertElement.innerHTML = '';
+
+            const result = await readNFC();
+
+            if (!result.success) {
+                statusElement.textContent = 'Error al leer tarjeta';
+                alertElement.innerHTML = `<div class="alert alert-error">${result.error}</div>`;
+                setTimeout(() => {
+                    statusElement.textContent = 'Pulsa aquí y acerca la tarjeta';
+                    alertElement.innerHTML = '';
+                }, 3000);
+                return;
+            }
+
+            document.getElementById('nfcId').value = result.nfcId;
+            statusElement.textContent = `✅ Tarjeta leída: ${result.nfcId}`;
+            alertElement.innerHTML = `<div class="alert alert-success">Tarjeta leída correctamente. Ahora completa los datos.</div>`;
+        };
+
+        // Registrar nuevo cliente
+        document.getElementById('nuevoClienteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const nfcId = document.getElementById('nfcId').value;
+            const matricula = document.getElementById('matricula').value.toUpperCase();
+            const nombreCliente = document.getElementById('nombreCliente').value;
+            const telefono = document.getElementById('telefono').value;
+            const alertElement = document.getElementById('nuevoAlert');
+
+            if (!nfcId) {
+                alertElement.innerHTML = `<div class="alert alert-error">Por favor, lee primero la tarjeta NFC.</div>`;
+                return;
+            }
+
+            try {
+                // Verificar si ya existe
+                const q = query(collection(db, 'clientes'), where('nfcId', '==', nfcId));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    alertElement.innerHTML = `<div class="alert alert-error">Esta tarjeta ya está registrada.</div>`;
+                    return;
+                }
+
+                // Registrar nuevo cliente
+                await addDoc(collection(db, 'clientes'), {
+                    nfcId: nfcId,
+                    matricula: matricula,
+                    nombreCliente: nombreCliente || '',
+                    telefono: telefono || '',
+                    lavadosPremium: 0,
+                    lavadosExcellence: 0,
+                    lavadosGratisPremium: 0,
+                    lavadosGratisExcellence: 0,
+                    fechaRegistro: Timestamp.now(),
+                    ultimoLavado: null
+                });
+
+                alertElement.innerHTML = `<div class="alert alert-success">✅ Cliente registrado correctamente: ${matricula}</div>`;
+                document.getElementById('nuevoClienteForm').reset();
+                document.getElementById('nfcStatusNuevo').textContent = 'Pulsa aquí y acerca la tarjeta';
+
+                setTimeout(() => {
+                    alertElement.innerHTML = '';
+                }, 3000);
+
+            } catch (error) {
+                alertElement.innerHTML = `<div class="alert alert-error">Error al registrar: ${error.message}</div>`;
+            }
+        });
+
+        // Mostrar clientes
+        window.mostrarClientes = async function() {
+            const clientesList = document.getElementById('clientesList');
+            clientesList.innerHTML = '<div class="loading">Cargando clientes</div>';
+
+            try {
+                const q = query(collection(db, 'clientes'), orderBy('fechaRegistro', 'desc'));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    clientesList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🚗</div>
+                            <p>No hay clientes registrados todavía</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const progresoPremium = ((data.lavadosPremium || 0) / 10) * 100;
+                    const progresoExcellence = ((data.lavadosExcellence || 0) / 10) * 100;
+                    let ultimoLavado = 'Nunca';
+                    
+                    if (data.ultimoLavado) {
+                        const fecha = new Date(data.ultimoLavado.seconds * 1000);
+                        const fechaStr = fecha.toLocaleDateString('es-ES');
+                        const horaStr = fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                        ultimoLavado = `${fechaStr} a las ${horaStr}`;
+                    }
+
+                    html += `
+                        <div class="car-card">
+                            <h3>${data.matricula}</h3>
+                            <div class="car-info">
+                                <div class="car-info-item">
+                                    <label>Cliente</label>
+                                    <span>${data.nombreCliente || 'No especificado'}</span>
+                                </div>
+                                <div class="car-info-item">
+                                    <label>Teléfono</label>
+                                    <span>${data.telefono || 'No especificado'}</span>
+                                </div>
+                                <div class="car-info-item" style="grid-column: 1 / -1;">
+                                    <label>Último Lavado</label>
+                                    <span>${ultimoLavado}</span>
+                                </div>
+                                <div class="car-info-item" style="grid-column: 1 / -1;">
+                                    <label>ID Tarjeta</label>
+                                    <span style="font-size: 12px;">${data.nfcId}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="progress-section">
+                                <div class="progress-title">
+                                    <span>⭐ Lavados Premium</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${progresoPremium}%; background: linear-gradient(90deg, #f7b733 0%, #fc4a1a 100%);">
+                                        ${data.lavadosPremium || 0} / 10 lavados
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="progress-section">
+                                <div class="progress-title">
+                                    <span>💎 Lavados Excellence</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${progresoExcellence}%; background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);">
+                                        ${data.lavadosExcellence || 0} / 10 lavados
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${(data.lavadosGratisPremium > 0 || data.lavadosGratisExcellence > 0) ? 
+                                `<div style="margin-top: 15px;">
+                                    ${data.lavadosGratisPremium > 0 ? 
+                                        `<div class="free-wash-badge" style="background: linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%);">
+                                            ⭐ ${data.lavadosGratisPremium} Premium GRATIS
+                                        </div>` : ''}
+                                    ${data.lavadosGratisExcellence > 0 ? 
+                                        `<div class="free-wash-badge" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                            💎 ${data.lavadosGratisExcellence} Excellence GRATIS
+                                        </div>` : ''}
+                                </div>` : 
+                                ''}
+                            
+                            <button class="btn-delete" onclick="eliminarCliente('${doc.id}', '${data.matricula}')">
+                                🗑️ Eliminar Cliente
+                            </button>
+                        </div>
+                    `;
+                });
+
+                clientesList.innerHTML = html;
+
+            } catch (error) {
+                clientesList.innerHTML = `<div class="alert alert-error">Error al cargar clientes: ${error.message}</div>`;
+            }
+        };
+
+        // Eliminar lavado del historial
+        window.eliminarLavado = async function(docId, nfcId, matricula, lavadoGratis, tipoLavado) {
+            if (!confirm(`¿Estás seguro de eliminar este lavado de ${matricula}?`)) {
+                return;
+            }
+
+            try {
+                // Buscar el cliente
+                const q = query(collection(db, 'clientes'), where('nfcId', '==', nfcId));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const clienteDoc = querySnapshot.docs[0];
+                    const clienteData = clienteDoc.data();
+                    
+                    let updateData = {};
+
+                    if (lavadoGratis) {
+                        // Si se elimina un lavado gratis, restamos uno del contador de gratis correspondiente
+                        if (tipoLavado === 'premium') {
+                            const nuevosGratis = Math.max(0, (clienteData.lavadosGratisPremium || 0) - 1);
+                            updateData.lavadosGratisPremium = nuevosGratis;
+                        } else {
+                            const nuevosGratis = Math.max(0, (clienteData.lavadosGratisExcellence || 0) - 1);
+                            updateData.lavadosGratisExcellence = nuevosGratis;
+                        }
+                    } else {
+                        // Si se elimina un lavado normal, restamos uno del contador correspondiente
+                        if (tipoLavado === 'premium') {
+                            const nuevoContador = Math.max(0, (clienteData.lavadosPremium || 0) - 1);
+                            updateData.lavadosPremium = nuevoContador;
+                        } else {
+                            const nuevoContador = Math.max(0, (clienteData.lavadosExcellence || 0) - 1);
+                            updateData.lavadosExcellence = nuevoContador;
+                        }
+                    }
+
+                    // Actualizar el cliente
+                    await updateDoc(doc(db, 'clientes', clienteDoc.id), updateData);
+                }
+
+                // Eliminar del historial
+                await deleteDoc(doc(db, 'historial', docId));
+
+                alert('✅ Lavado eliminado correctamente. El contador del cliente se ha actualizado.');
+                mostrarHistorial(); // Recargar la lista
+
+            } catch (error) {
+                alert('Error al eliminar: ' + error.message);
+            }
+        };
+
+        // Eliminar cliente
+        window.eliminarCliente = async function(docId, matricula) {
+            if (!confirm(`¿Estás seguro de eliminar el cliente con matrícula ${matricula}?`)) {
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, 'clientes', docId));
+                alert('Cliente eliminado correctamente');
+                mostrarClientes();
+            } catch (error) {
+                alert('Error al eliminar: ' + error.message);
+            }
+        };
+
+        // Mostrar estadísticas
+        window.mostrarEstadisticas = async function() {
+            const estadisticasContent = document.getElementById('estadisticasContent');
+            estadisticasContent.innerHTML = '<div class="loading">Calculando estadísticas</div>';
+
+            try {
+                const clientesSnapshot = await getDocs(collection(db, 'clientes'));
+                const historialSnapshot = await getDocs(collection(db, 'historial'));
+
+                const totalClientes = clientesSnapshot.size;
+                const totalLavados = historialSnapshot.size;
+                
+                let lavadosPremiumTotal = 0;
+                let lavadosExcellenceTotal = 0;
+                let lavadosGratisPremiumDisponibles = 0;
+                let lavadosGratisExcellenceDisponibles = 0;
+                let lavadosGratisPremiumCanjeados = 0;
+                let lavadosGratisExcellenceCanjeados = 0;
+
+                clientesSnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    lavadosGratisPremiumDisponibles += data.lavadosGratisPremium || 0;
+                    lavadosGratisExcellenceDisponibles += data.lavadosGratisExcellence || 0;
+                });
+
+                historialSnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const tipoLavado = data.tipoLavado || 'premium';
+                    
+                    if (tipoLavado === 'premium') {
+                        lavadosPremiumTotal++;
+                        if (data.lavadoGratis) {
+                            lavadosGratisPremiumCanjeados++;
+                        }
+                    } else {
+                        lavadosExcellenceTotal++;
+                        if (data.lavadoGratis) {
+                            lavadosGratisExcellenceCanjeados++;
+                        }
+                    }
+                });
+
+                estadisticasContent.innerHTML = `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">${totalClientes}</div>
+                            <div class="stat-label">Clientes Registrados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${totalLavados}</div>
+                            <div class="stat-label">Lavados Totales</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%);">
+                            <div class="stat-number">${lavadosPremiumTotal}</div>
+                            <div class="stat-label">⭐ Lavados Premium</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <div class="stat-number">${lavadosExcellenceTotal}</div>
+                            <div class="stat-label">💎 Lavados Excellence</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%);">
+                            <div class="stat-number">${lavadosGratisPremiumDisponibles}</div>
+                            <div class="stat-label">Premium Gratis Disponibles</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <div class="stat-number">${lavadosGratisExcellenceDisponibles}</div>
+                            <div class="stat-label">Excellence Gratis Disponibles</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%);">
+                            <div class="stat-number">${lavadosGratisPremiumCanjeados}</div>
+                            <div class="stat-label">Premium Gratis Canjeados</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <div class="stat-number">${lavadosGratisExcellenceCanjeados}</div>
+                            <div class="stat-label">Excellence Gratis Canjeados</div>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                estadisticasContent.innerHTML = `<div class="alert alert-error">Error al calcular estadísticas: ${error.message}</div>`;
+            }
+        };
+
+        // Mostrar historial
+        window.mostrarHistorial = async function() {
+            const historialList = document.getElementById('historialList');
+            historialList.innerHTML = '<div class="loading">Cargando historial</div>';
+
+            try {
+                const q = query(collection(db, 'historial'), orderBy('fecha', 'desc'));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    historialList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <p>No hay lavados registrados todavía</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const fecha = new Date(data.fecha.seconds * 1000);
+                    const fechaFormato = fecha.toLocaleDateString('es-ES', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    });
+                    const horaFormato = fecha.toLocaleTimeString('es-ES', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+
+                    const tipoLavado = data.tipoLavado || 'premium'; // Para compatibilidad con registros antiguos
+                    const tipoBadge = tipoLavado === 'premium' 
+                        ? '<span class="lavado-type-badge badge-premium">⭐ PREMIUM</span>'
+                        : '<span class="lavado-type-badge badge-excellence">💎 EXCELLENCE</span>';
+                    const gratisText = data.lavadoGratis ? ' 🎁 GRATIS' : '';
+
+                    html += `
+                        <div class="car-card">
+                            <h3>${data.matricula}${tipoBadge}${gratisText}</h3>
+                            <div class="car-info">
+                                <div class="car-info-item">
+                                    <label>Fecha</label>
+                                    <span>${fechaFormato}</span>
+                                </div>
+                                <div class="car-info-item">
+                                    <label>Hora</label>
+                                    <span style="font-size: 20px; color: #667eea;">${horaFormato}</span>
+                                </div>
+                                <div class="car-info-item">
+                                    <label>ID Tarjeta</label>
+                                    <span style="font-size: 12px;">${data.nfcId}</span>
+                                </div>
+                                <div class="car-info-item">
+                                    <label>Estado</label>
+                                    <span>${data.lavadoGratis ? '🎁 Gratis' : '💰 Normal'}</span>
+                                </div>
+                            </div>
+                            <button class="btn-delete" onclick="eliminarLavado('${doc.id}', '${data.nfcId}', '${data.matricula}', ${data.lavadoGratis}, '${tipoLavado}')">
+                                🗑️ Eliminar Lavado
+                            </button>
+                        </div>
+                    `;
+                });
+
+                historialList.innerHTML = html;
+
+            } catch (error) {
+                historialList.innerHTML = `<div class="alert alert-error">Error al cargar historial: ${error.message}</div>`;
+            }
+        };
+
+        // Exportar historial a Excel
+        window.exportarHistorial = async function() {
+            try {
+                const historialSnapshot = await getDocs(query(collection(db, 'historial'), orderBy('fecha', 'desc')));
+                
+                if (historialSnapshot.empty) {
+                    alert('No hay datos para exportar');
+                    return;
+                }
+
+                // Crear CSV
+                let csv = 'Matrícula,Fecha,Hora,Tipo de Lavado,Estado,ID Tarjeta\n';
+                
+                historialSnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const fecha = new Date(data.fecha.seconds * 1000);
+                    const fechaStr = fecha.toLocaleDateString('es-ES');
+                    const horaStr = fecha.toLocaleTimeString('es-ES');
+                    const tipoLavado = data.tipoLavado || 'premium';
+                    const tipoTexto = tipoLavado === 'premium' ? 'Premium' : 'Excellence';
+                    const estado = data.lavadoGratis ? 'GRATIS' : 'Normal';
+                    
+                    csv += `${data.matricula},${fechaStr},${horaStr},${tipoTexto},${estado},${data.nfcId}\n`;
+                });
+
+                // Descargar archivo
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                const ahora = new Date();
+                const nombreArchivo = `historial_lavados_${ahora.getFullYear()}-${(ahora.getMonth()+1).toString().padStart(2,'0')}-${ahora.getDate().toString().padStart(2,'0')}.csv`;
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', nombreArchivo);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                alert('✅ Historial exportado correctamente');
+
+            } catch (error) {
+                alert('Error al exportar: ' + error.message);
+            }
+        };
+
+        // Navigation
+        window.showSection = function(sectionName) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(`section-${sectionName}`).classList.add('active');
+            
+            // Find which button was clicked and make it active
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.includes('Nuevo Cliente') && sectionName === 'nuevo') btn.classList.add('active');
+                if (btn.textContent.includes('Ver Clientes') && sectionName === 'clientes') btn.classList.add('active');
+                if (btn.textContent.includes('Historial') && sectionName === 'historial') btn.classList.add('active');
+                if (btn.textContent.includes('Estadísticas') && sectionName === 'estadisticas') btn.classList.add('active');
+            });
+
+            if (sectionName === 'clientes') {
+                mostrarClientes();
+            } else if (sectionName === 'historial') {
+                mostrarHistorial();
+            } else if (sectionName === 'estadisticas') {
+                mostrarEstadisticas();
+            }
+        };
+
+        // Auto-start - removed since we now have manual buttons
+        window.addEventListener('load', () => {
+            // Ready to use
+        });
+    </script>
+</body>
+</html>
